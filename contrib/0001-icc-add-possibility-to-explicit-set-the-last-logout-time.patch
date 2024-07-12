@@ -1,0 +1,60 @@
+From a820b6b2e87800b53a7b63723d491120d645ff0a Mon Sep 17 00:00:00 2001
+From: Alexander Sulfrian <alexander.sulfrian@fu-berlin.de>
+Date: Mon, 29 Oct 2012 16:25:32 +0100
+Subject: [PATCH 1/2] icc: add possibility to explicit set the last logout time
+
+---
+ src/icc.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/icc.c b/src/icc.c
+index 3fc0363..03fe639 100644
+--- a/src/icc.c
++++ b/src/icc.c
+@@ -248,19 +248,20 @@ extern void ICC_Recycle_Loop( void )
+ 
+ 
+ /*++
+- * Function:	ICC_Logout
++ * Function:	ICC_Set_Logout_Time
+  *
+  * Purpose:	set the last logout time for an IMAP connection context.
+  *
+  * Parameters:	char *Username
+  *		int server-side socket descriptor
++ *		time_t logout time to set
+  *		
+  * Returns:	nada
+  *
+  * Authors:	Dave McMurtrie <davemcmurtrie@hotmail.com>
+  *--
+  */
+-extern void ICC_Logout( char *Username, ICD_Struct *conn )
++extern void ICC_Set_Logout_Time( char *Username, ICD_Struct *conn, time_t time )
+ {
+     char *fn = "ICC_Logout()";
+     unsigned int HashIndex;
+@@ -298,7 +299,7 @@ extern void ICC_Logout( char *Username, ICD_Struct *conn )
+ 	return;
+     }
+     
+-    ICC_Active->logouttime = time(0);
++    ICC_Active->logouttime = time;
+ 
+     UnLockMutex( &mp );
+     
+@@ -307,6 +308,11 @@ extern void ICC_Logout( char *Username, ICD_Struct *conn )
+     return;
+ }
+ 
++extern void ICC_Logout( char *Username, ICD_Struct *conn )
++{
++    return ICC_Set_Logout_Time(Username, conn, time(0));
++}
++
+ 
+ 
+ /*
+-- 
+1.7.12.3-zedat
+

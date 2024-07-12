@@ -1,0 +1,51 @@
+From de0585cdae6cf7d5025f990e06ef474192b5e9d4 Mon Sep 17 00:00:00 2001
+From: Alexander Sulfrian <alexander.sulfrian@fu-berlin.de>
+Date: Mon, 29 Oct 2012 16:28:18 +0100
+Subject: [PATCH 2/2] request: close the server connection on error
+
+if an error occurs during the connection proxy the the server
+(f.e. caused by a connection close from the client during attachment
+transfer) the connection to the server is also closed to force a new
+connection on the next connection attempt from the client
+---
+ src/request.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/src/request.c b/src/request.c
+index 627036f..622fb09 100644
+--- a/src/request.c
++++ b/src/request.c
+@@ -910,7 +910,12 @@ static int cmd_authenticate_login( ITD_Struct *Client,
+     Client->TraceOn = 0;
+     Server.TraceOn = 0;
+     
+-    ICC_Logout( Username, Server.conn );
++    if ( rc < 0 ) {
++        ICC_Set_Logout_Time( Username, Server.conn, 1 );
++    }
++    else {
++        ICC_Logout( Username, Server.conn );
++    }
+     
+     return( rc );
+ }
+@@ -1070,8 +1075,14 @@ static int cmd_login( ITD_Struct *Client,
+     Client->TraceOn = 0;
+     Server.TraceOn = 0;
+     
+-    /* update the logout time for this cached connection */
+-    ICC_Logout( Username, Server.conn );
++    if ( rc < 0 ) {
++        /* close the server connection on error (timeout) */
++        ICC_Set_Logout_Time( Username, Server.conn, 1 );
++    }
++    else {
++        /* update the logout time for this cached connection */
++        ICC_Logout( Username, Server.conn );
++    }
+     
+     return( rc );
+ }
+-- 
+1.7.12.3-zedat
+

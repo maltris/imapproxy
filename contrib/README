@@ -1,0 +1,41 @@
+The contrib directory contains miscellaneous information or resources
+related to SquirrelMail IMAP Proxy.
+
+===============================================================================
+
+Alexander contributed a patch for solving a problem
+he had with hung connections:
+
+https://sourceforge.net/p/squirrelmail/patches/480/
+
+-------------------------------------------------------------------------------
+
+Hi,
+
+in our setup we had a problem with imapproxy. The problem occurs if a user cancels a attachment download within squirrelmail. After that all folder seems empty and the user has to wait the configured time until imapproxy closes the connections. Debugging the situation we found out, that imapproxy preserves the closed connection and continue to send the attachment data within the next imap connection.
+
+I have prepared a series of two patches to fix this issue:
+
+The first patch renames the ICC_Logout function to ICC_Set_Logout_Time, that accepts a third parameter, that is the value to set the logouttime to. ICC_Logout is a simple wrapper of that function to set the logout time time to the current time (the same behavior as before).
+
+The second patch closes the connection to the server (by setting the logouttime to 1) if an error occurs in the Raw_Proxy method (returning a status code less than 0). This is exactly the case if the client does close the connection within a transfer. The error that occurs is a write error on the closed client fd. If no error occurs the logouttime is set to the current time exactly as before.
+
+The two patches fixes the problem for our setup.
+
+Thanks,
+Alex
+
+-------------------------------------------------------------------------------
+
+These patches are believed to be unnecessary because
+they were based on an older version (pre 1.2.8) where
+newer code already has changes that help invalidate
+hung server connections.
+
+Nevertheless, the patch files are included herein for posterity as:
+
+0001-icc-add-possibility-to-explicit-set-the-last-logout-time.patch
+0002-request-close-the-server-connection-on-error.patch
+
+===============================================================================
+

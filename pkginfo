@@ -1,0 +1,9 @@
+PKG=squirrelmail-imap_proxy
+NAME=SquirrelMail IMAP Proxy
+ARCH=sparc
+VERSION=1.2.8 [SVN]
+CATEGORY=application
+VENDOR=imapproxy.org
+DESC=This is a connection caching IMAP proxy daemon for proxied IMAP connections
+BASEDIR=/usr/local
+CLASSES=none
