@@ -554,16 +554,18 @@ extern ICD_Struct *Get_Server_conn( char *Username,
     unsigned int Expiration;
     struct addrinfo *useai;
 
-    EVP_MD_CTX mdctx;
+    EVP_MD_CTX *mdctx;
+    mdctx = EVP_MD_CTX_create();
     int md_len;
 
     Expiration = PC_Struct.cache_expiration_time;
     memset( &Server, 0, sizeof Server );
     
     /* need to md5 the passwd regardless, so do that now */
-    EVP_DigestInit(&mdctx, EVP_md5());
-    EVP_DigestUpdate(&mdctx, Password, strlen(Password));
-    EVP_DigestFinal(&mdctx, md5pw, &md_len);
+    EVP_DigestInit(mdctx, EVP_md5());
+    EVP_DigestUpdate(mdctx, Password, strlen(Password));
+    EVP_DigestFinal(mdctx, md5pw, &md_len);
+    EVP_MD_CTX_destroy(mdctx);
     
     /* see if we have a reusable connection available */
     ICC_Active = NULL;

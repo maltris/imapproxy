@@ -460,13 +460,13 @@ int main( int argc, char *argv[] )
     /* Set up OpenSSL thread protection */
     ssl_thread_setup(fn);
 
-#ifndef HAVE_RAND_EGD
+/* #ifndef HAVE_RAND_EGD
     if ( RAND_egd( ( RAND_file_name( f_randfile, sizeof( f_randfile ) ) == f_randfile ) ? f_randfile : "/.rnd" ) ) 
 #endif
-    {
+    { */
 	if ( RAND_load_file( f_randfile, -1 ) )
 	    RAND_write_file( f_randfile );
-    }
+    // }
 
     SSL_load_error_strings();
 
@@ -1574,9 +1574,9 @@ static int verify_callback(int ok, X509_STORE_CTX * ctx)
 	    verify_error = X509_V_ERR_CERT_CHAIN_TOO_LONG;
 	}
     }
-    switch (ctx->error) {
+    switch (X509_STORE_CTX_get_error(ctx)) {
     case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
-	X509_NAME_oneline(X509_get_issuer_name(ctx->current_cert), buf, sizeof(buf));
+	X509_NAME_oneline(X509_get_issuer_name(X509_STORE_CTX_get_current_cert(ctx)), buf, sizeof(buf));
 	syslog(LOG_NOTICE, "issuer= %s", buf);
 	break;
     case X509_V_ERR_CERT_NOT_YET_VALID:
