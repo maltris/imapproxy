@@ -1,0 +1,28 @@
+FROM ubuntu:jammy
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+      && apt-get -y install \
+	ca-certificates \
+        inetutils-syslogd \
+        ssl-cert \
+        libssl-dev \
+        gcc \
+        make \
+        subversion \
+        libncurses-dev \
+        libwrap0-dev \
+        libssl-dev
+
+ADD ./imap_proxy /imap_proxy
+WORKDIR imap_proxy/
+
+RUN ./configure && make && make install
+
+ADD imapproxy.conf /etc/
+ADD entrypoint.sh /
+
+EXPOSE 143
+
+CMD /entrypoint.sh

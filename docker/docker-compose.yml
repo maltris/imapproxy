@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+
+  imapproxy:
+    build: .
+    environment:
+      HOST: another.host
+      TLSKEYFILE: test
+      TLSCERTFILE: test
+    ports:
+      - "143:143"
+    volumes:
+      - "./log:/var/log"
